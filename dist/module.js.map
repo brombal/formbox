@@ -1,0 +1,1 @@
+{"mappings":"kDAC4B,CAAS,EAAE,CAAS,EAAE,CAAC;IACjD,MAAM,CAAC,CAAC,GAAG,CAAC;AACd,CAAC","sources":["src/main.ts"],"sourcesContent":["\nexport default function add(x: number, y: number) {\n  return x + y;\n}\n"],"names":[],"version":3,"file":"module.js.map"}

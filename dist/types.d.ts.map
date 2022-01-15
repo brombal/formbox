@@ -1,0 +1,1 @@
+{"mappings":"AACA,4BAA4B,CAAC,EAAE,MAAM,EAAE,CAAC,EAAE,MAAM,UAE/C","sources":["src/src/main.ts","src/main.ts"],"sourcesContent":[null,"\nexport default function add(x: number, y: number) {\n  return x + y;\n}\n"],"names":[],"version":3,"file":"types.d.ts.map"}

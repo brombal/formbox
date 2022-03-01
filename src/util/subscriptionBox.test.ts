@@ -140,3 +140,22 @@ test('Complex data types trigger changes', () => {
   expect(listener2).toHaveBeenCalledTimes(1);
   expect(listener3).toHaveBeenCalledTimes(1);
 });
+
+test('Returning a value replaces entire state', () => {
+  const box = new SubscriptionBox({ a: 1, b: 2 });
+
+  const listener1 = jest.fn();
+  const unsubscribe1 = box.subscribe((data) => data.a, listener1);
+
+  const listener2 = jest.fn();
+  const unsubscribe2 = box.subscribe((data) => data.b, listener2);
+
+  box.set(() => ({
+    a: 2,
+    b: 2,
+  }));
+
+  expect(box.data).toStrictEqual({ a: 2, b: 2 })
+  expect(listener1).toHaveBeenCalledTimes(1);
+  expect(listener2).toHaveBeenCalledTimes(0);
+});

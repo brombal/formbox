@@ -1,24 +1,25 @@
-import { AnySchema, ValidationError } from "yup";
-import set from "just-safe-set";
-import get from "just-safe-get";
+import { AnySchema, ValidationError } from 'yup';
+import set from 'just-safe-set';
+import get from 'just-safe-get';
 
 export const createYupValidator = (schema: AnySchema) => {
   return async (values: any) => {
     try {
       await schema.validate(values, { context: values, abortEarly: false });
       return null;
-    } catch (err) {
-      return yupToFormErrors(err);
+    } catch (err: any) {
+      return yupErrorToObject(err);
     }
   };
 };
 
-function yupToFormErrors(yupError: ValidationError) {
+function yupErrorToObject(yupError: ValidationError): object {
   const errors: any = {};
 
   if (yupError.inner) {
     if (yupError.inner.length === 0) {
-      return set(errors, yupError.path!, yupError.message);
+      set(errors, yupError.path!, yupError.message);
+      return errors;
     }
 
     for (const err of yupError.inner) {

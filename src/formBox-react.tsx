@@ -1,11 +1,9 @@
-import { get } from 'lodash';
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import get from 'just-safe-get';
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   CastProperties,
   cleanPath,
-  createFormBox,
-  createPathSelector,
   FormBox,
   FormBoxConfig,
   FormBoxInputPropsConfig,
@@ -15,21 +13,29 @@ import {
 } from './formBox';
 import { mapObject } from './util/mapObject';
 
-const formContext = createContext<FormBox<any> | undefined>(undefined);
+const formContext = createContext<FormBox<any>>(null as any);
 
-export function FormProvider<T>({ form, ...other }: { form: FormBox<T>; children: any }) {
+export function FormBoxProvider<TValues extends object>({
+  form,
+  ...other
+}: {
+  form: FormBox<TValues>;
+  children: any;
+}) {
   return <formContext.Provider value={form} {...other} />;
 }
 
-export function useFormBox<TValues>(config: FormBoxConfig<TValues>): FormBox<TValues> {
+export function useCreateFormBox<TValues extends object>(
+  config: FormBoxConfig<TValues>,
+): FormBox<TValues> {
   const formRef = useRef<FormBox<TValues>>();
   if (!formRef.current) {
-    formRef.current = createFormBox<TValues>(config);
+    formRef.current = new FormBox<TValues>(config);
   }
   formRef.current!.config = config;
 
   useEffect(() => {
-    if (formRef.current!.config.validateOnMount) formRef.current!.validate();
+    // if (formRef.current!.config.validateOnMount) formRef.current!.validate();
     return () => formRef.current!.destroy();
   }, []);
 
@@ -39,42 +45,44 @@ export function useFormBox<TValues>(config: FormBoxConfig<TValues>): FormBox<TVa
 /*
 Returns the current form object.
 */
-export function useFormContext<TValues>(): FormBox<TValues> {
+export function useFormBox<TValues extends object>(): FormBox<TValues> {
   return useContext(formContext)!;
 }
 
-export function useInputProps(path: SelectorPath, config?: FormBoxInputPropsConfig) {
-  const form = useFormContext();
+export function useInputProps(
+  path: SelectorPath,
+  config?: FormBoxInputPropsConfig,
+  deps: any[] = [],
+) {
+  const form = useFormBox();
   const value = useFormState(['values', ...cleanPath(path)], form);
   return useMemo(
     () => ({ value, ...form.getInputHandlers(path, config) }),
-    [value, JSON.stringify(path)],
+    [value, JSON.stringify(path), ...deps],
   );
 }
 
 /*
-Returns the current form state returned by `selector` and re-renders when it changes.
+Returns the current form state returned by `selector` and re-renders the component whenever it changes.
 */
-export function useFormState<TValues = any, TOut = any>(
+export function useFormState<TValues extends object = any, TOut = any>(
   selector: Selector<FormBoxState<TValues>, TOut>,
   form?: FormBox<TValues>,
 ): TOut {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   form = form || useContext(formContext)!;
   const [, trigger] = useState({});
   useFormEffect(selector, () => trigger({}), form);
-  return form.getState(selector);
+  return createPathSelector(selector)(form.state);
 }
 
 /*
-Triggers `effect` to run with the state value returned by `selector` changes.
+Triggers `effect` to run whenever the state value returned by `selector` changes.
  */
-export function useFormEffect<TValues>(
+export function useFormEffect<TValues extends object>(
   selector: Selector<FormBoxState<TValues>, any>,
   effect: (val: any) => void,
   form?: FormBox<TValues>,
 ) {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   form = form || useContext(formContext)!;
   useEffect(() => {
     const unsub = form!.subscribe(createPathSelector(selector), (val: any) => effect(val));
@@ -82,7 +90,10 @@ export function useFormEffect<TValues>(
   }, [JSON.stringify(selector)]);
 }
 
-export function useTouchedErrors<TValues>(
+/*
+Utility hook that returns only the errors for fields that are also touched.
+ */
+export function useTouchedErrors<TValues extends object>(
   form?: FormBox<TValues>,
 ): CastProperties<TValues, string> | null {
   const errors = useFormState('errors', form);
@@ -93,3 +104,11 @@ export function useTouchedErrors<TValues>(
     { omitEmpty: true },
   );
 }
+
+/**
+ * Given a selector `path`, returns a function that accepts an object and returns the value located at `path`.
+ */
+const createPathSelector =
+  <TIn, TOut>(path: Selector<TIn, TOut>) =>
+  (data: TIn): TOut =>
+    typeof path === 'function' ? path(data) : get(data, cleanPath(path));

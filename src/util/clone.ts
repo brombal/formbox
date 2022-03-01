@@ -5,6 +5,9 @@ export default function clone(value: any) {
   if (typeof value !== 'object') return value;
   if (Array.isArray(value)) return Array.from(value);
   if (value.constructor === Error) return new Error(value.message);
+  if (value.constructor === Date) return new Date(value);
+  if (value.constructor === RegExp) return new RegExp(value);
+  if (value.constructor === Set) return new Set(value);
   if (isObject(value)) {
     const result: any = {};
     for (const k in value) {
@@ -12,5 +15,5 @@ export default function clone(value: any) {
     }
     return result;
   }
-  return new value.constructor(value);
+  throw new Error(`Cannot clone value: ${value} of type ${value.constructor.name}`);
 }

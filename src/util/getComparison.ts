@@ -10,7 +10,7 @@ import isObject from './isObject';
  Returns an object that can be used to compare `a` and `b` (and their nested properties) using `===`.
 
  The return value will be structurally the same as `b`. However, any properties that are
- equivalent objects (using a deep comparison) to `a`'s properties will be comparable using `===`.
+ equivalent values (using a deep comparison) to `a`'s properties will be comparable using `===`.
  This will be true for properties at any nested level, including the top level (i.e. if `a` and `b`
  are equivalent, `a` will be identical to the return value).
 

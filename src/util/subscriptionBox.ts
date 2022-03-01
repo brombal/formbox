@@ -56,14 +56,29 @@ export default class SubscriptionBox<TData extends object> {
     return this._data;
   }
 
-  set = (data: TData | ((data: TData) => void)) => {
+  set = (data: TData | ((data: TData) => TData | void)) => {
     let newData = data;
     if (typeof data === 'function') {
-      newData = clone(this.data);
-      (data as any)(newData);
+      try {
+        newData = clone(this.data);
+      } catch (e: any) {
+        const err: any = new Error('Error cloning subscriptionBox data: ' + e.message);
+        err.data = this.data;
+        err.innerError = e;
+        throw err;
+      }
+      let result = (data as any)(newData);
+      if (typeof result !== 'undefined') newData = result;
     }
     const oldData = this.data;
-    this._data = getComparison(this.data, newData);
+    try {
+      this._data = getComparison(this.data, newData);
+    } catch (e: any) {
+      const err: any = new Error('Error comparing subscriptionBox data: ' + e.message);
+      err.newData = newData;
+      err.innerError = e;
+      throw err;
+    }
     this.subscriptions.forEach((sub) => {
       const oldValue = sub.selector(oldData);
       const newValue = sub.selector(this.data);

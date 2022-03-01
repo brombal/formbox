@@ -89,7 +89,9 @@ test('setState with callback works', () => {
     initialValues: { a: 1, b: 2 },
   });
 
-  f.setState((state) => (state.errors = { a: 'something' }));
+  f.setState((state) => {
+    state.errors = { a: 'something' };
+  });
   expect(f.errors).toStrictEqual({ a: 'something' });
 });
 
@@ -228,7 +230,23 @@ test('handleSubmit with no onSubmit works', async () => {
   expect(f.touched).toEqual({ a: true, b: true });
 });
 
-test('getInputHanlders for input works', async () => {
+test('getInputHandlers with no config works', async () => {
+  const f = new FormBox({
+    initialValues: { a: 1, b: 2 },
+  });
+
+  const handlers = f.getInputHandlers('a');
+  handlers.onChange({ target: { value: 'x' } } as any);
+  expect(f.values).toStrictEqual({ a: 'x', b: 2 });
+  expect(f.touched).toStrictEqual({ a: true });
+  handlers.onFocus({} as any);
+  expect(f.active).toStrictEqual({ a: true });
+  handlers.onBlur({} as any);
+  expect(f.active).toStrictEqual({ a: false });
+  expect(f.touched).toStrictEqual({ a: true });
+});
+
+test('getInputHandlers for type input works', async () => {
   const f = new FormBox({
     initialValues: { a: 1, b: 2 },
   });
@@ -243,13 +261,91 @@ test('getInputHanlders for input works', async () => {
   handlers.onChange({ target: { value: 'x' } } as any);
   expect(f.values).toStrictEqual({ a: 'x', b: 2 });
   handlers.onFocus({} as any);
-  expect(f.active).toStrictEqual({ a: true });
-  expect(f.touched).toStrictEqual({ a: false });
   handlers.onBlur({} as any);
-  expect(f.active).toStrictEqual({ a: false });
-  expect(f.touched).toStrictEqual({ a: true });
 
   expect(config.onChange).toHaveBeenCalledTimes(1);
   expect(config.onFocus).toHaveBeenCalledTimes(1);
   expect(config.onBlur).toHaveBeenCalledTimes(1);
+});
+
+test('getInputHandlers for type checkbox works', async () => {
+  const f = new FormBox({
+    initialValues: { a: 1 },
+  });
+
+  const config = {
+    type: 'checkbox',
+    onChange: jest.fn(),
+    onFocus: jest.fn(),
+    onBlur: jest.fn(),
+  } as const;
+  const handlers = f.getInputHandlers('a', config);
+
+  await handlers.onChange({ target: { checked: true, value: 'x' } } as any);
+  expect(f.values).toStrictEqual({ a: 'x' });
+
+  await handlers.onChange({ target: { checked: true, value: undefined } } as any);
+  expect(f.values).toStrictEqual({ a: true });
+
+  await handlers.onChange({ target: { checked: false, value: 'x' } } as any);
+  expect(f.values).toStrictEqual({ a: undefined });
+
+  expect(config.onChange).toHaveBeenCalledTimes(3);
+});
+
+test('getInputHandlers for type raw works', async () => {
+  const f = new FormBox({
+    initialValues: { a: 1 },
+  });
+
+  const config = {
+    type: 'raw',
+    onChange: jest.fn(),
+    onFocus: jest.fn(),
+    onBlur: jest.fn(),
+  } as const;
+  const handlers = f.getInputHandlers('a', config);
+
+  await handlers.onChange('customValue1' as any);
+  expect(f.values).toStrictEqual({ a: 'customValue1' });
+
+  await handlers.onChange('customValue2' as any);
+  expect(f.values).toStrictEqual({ a: 'customValue2' });
+
+  expect(config.onChange).toHaveBeenCalledTimes(2);
+});
+
+test('getInputHandlers calls validate on change/blur', async () => {
+  const f = new FormBox({
+    initialValues: { a: 1 },
+    validateOnChange: true,
+    validateOnBlur: true,
+    validate: jest.fn()
+  });
+
+  const handlers = f.getInputHandlers('a');
+
+  await handlers.onBlur({ target: { value: '' } } as any);
+  expect(f.config.validate).toHaveBeenCalledTimes(1);
+  expect(f.config.validate).toHaveBeenCalledWith({ a: 1 });
+
+  await handlers.onChange({ target: { value: 'xxx' } } as any);
+  expect(f.values).toStrictEqual({ a: 'xxx' });
+  expect(f.config.validate).toHaveBeenCalledTimes(2);
+  expect(f.config.validate).toHaveBeenCalledWith({ a: 'xxx' });
+});
+
+test('getInputHandlers does not call validate on change/blur when disabled', async () => {
+  const f = new FormBox({
+    initialValues: { a: 1 },
+    validateOnChange: false,
+    validateOnBlur: false,
+    validate: jest.fn()
+  });
+
+  const handlers = f.getInputHandlers('a');
+
+  await handlers.onBlur({ target: { value: '' } } as any);
+  await handlers.onChange({ target: { value: 'xxx' } } as any);
+  expect(f.config.validate).toHaveBeenCalledTimes(0);
 });

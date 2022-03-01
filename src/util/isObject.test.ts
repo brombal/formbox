@@ -13,4 +13,8 @@ test('Succeeds', () => {
   expect(isObject(/abc/)).toBe(false);
   class Foo {}
   expect(isObject(new Foo())).toBe(false);
+  expect(isObject(null)).toBe(false);
+  expect(isObject(false)).toBe(false);
+  expect(isObject(undefined)).toBe(false);
+  expect(isObject(0)).toBe(false);
 });

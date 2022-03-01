@@ -1,3 +1,3 @@
-export default function isObject(value: any) {
-  return Object.getPrototypeOf(value) === Object.prototype;
+export default function isObject(value: any): boolean {
+  return !!value && Object.getPrototypeOf(value) === Object.prototype;
 }

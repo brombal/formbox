@@ -82,6 +82,7 @@ function $bc090ca26e5812e2$export$2e2bcd8739ae039(value) {
     if (value.constructor === Error) return new Error(value.message);
     if (value.constructor === Date) return new Date(value);
     if (value.constructor === RegExp) return new RegExp(value);
+    if (value.constructor === Set) return new Set(value);
     if ($f0607d64a58bf38b$export$2e2bcd8739ae039(value)) {
         const result = {
         };
@@ -248,7 +249,7 @@ class $fa22644d03289891$export$8cd7ca2dd7ba6f89 {
                         ], true);
                     });
                     inputConfig === null || inputConfig === void 0 ? void 0 : (ref = inputConfig.onChange) === null || ref === void 0 ? void 0 : ref.call(inputConfig, e);
-                    if (inputConfig.validateOnChange !== false && this.config.validateOnChange !== false) await this.validate();
+                    if ((inputConfig === null || inputConfig === void 0 ? void 0 : inputConfig.validateOnChange) !== false && this.config.validateOnChange !== false) await this.validate();
                 },
                 onFocus: (e)=>{
                     var ref;
@@ -273,7 +274,7 @@ class $fa22644d03289891$export$8cd7ca2dd7ba6f89 {
                         ], true);
                     });
                     inputConfig === null || inputConfig === void 0 ? void 0 : (ref = inputConfig.onBlur) === null || ref === void 0 ? void 0 : ref.call(inputConfig, e);
-                    if (inputConfig.validateOnBlur !== false && this.config.validateOnBlur !== false) await this.validate();
+                    if ((inputConfig === null || inputConfig === void 0 ? void 0 : inputConfig.validateOnBlur) !== false && this.config.validateOnBlur !== false) await this.validate();
                 }
             };
         };
@@ -405,7 +406,7 @@ function $b08afb9798ad624c$export$556f954a4a71c43(config) {
     if (!formRef.current) formRef.current = new $fa22644d03289891$export$8cd7ca2dd7ba6f89(config);
     formRef.current.config = config;
     $8I1y4$useEffect(()=>{
-        // if (formRef.current!.config.validateOnMount) formRef.current!.validate();
+        if (formRef.current.config.validateOnMount) formRef.current.validate();
         return ()=>formRef.current.destroy()
         ;
     }, []);

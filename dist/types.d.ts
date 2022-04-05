@@ -84,10 +84,10 @@ declare class FormBox<TValues extends object> implements FormBoxState<TValues> {
     setState(stateSetter: (state: FormBoxState<TValues>) => void): void;
     getState(selector: SelectorPath): any;
     subscribe: <TOut>(selector: SelectorFn<FormBoxState<TValues>, TOut>, callback: (val: TOut) => void) => (() => void);
-    validate: (values?: TValues) => Promise<any>;
+    validate: (values?: TValues | undefined) => Promise<any>;
     handleSubmit: (e: any) => Promise<void>;
     submit: () => Promise<void>;
-    getInputHandlers: (path: SelectorPath, inputConfig?: FormBoxInputPropsConfig) => FormBoxInputHandlers;
+    getInputHandlers: (path: SelectorPath, inputConfig?: FormBoxInputPropsConfig | undefined) => FormBoxInputHandlers;
     reset: () => void;
     /**
      * Convenience method that "touches" all fields that are currently in state.values.
@@ -97,10 +97,10 @@ declare class FormBox<TValues extends object> implements FormBoxState<TValues> {
     get initialValues(): TValues;
     get submitting(): boolean;
     get validating(): boolean;
-    get dirty(): CastProperties<TValues, boolean>;
-    get touched(): CastProperties<TValues, boolean>;
-    get active(): CastProperties<TValues, boolean>;
-    get errors(): CastProperties<TValues, string>;
+    get dirty(): CastProperties<TValues, boolean> | undefined;
+    get touched(): CastProperties<TValues, boolean> | undefined;
+    get active(): CastProperties<TValues, boolean> | undefined;
+    get errors(): CastProperties<TValues, string> | undefined;
     get meta(): any;
     get submitCount(): number;
     get valid(): boolean;
@@ -126,6 +126,6 @@ export function useInputProps(path: SelectorPath, config?: FormBoxInputPropsConf
 export function useFormState<TValues extends object = any, TOut = any>(selector: Selector<FormBoxState<TValues>, TOut>, form?: FormBox<TValues>): TOut;
 export function useFormEffect<TValues extends object>(selector: Selector<FormBoxState<TValues>, any>, effect: (val: any) => void, form?: FormBox<TValues>): void;
 export function useTouchedErrors<TValues extends object>(form?: FormBox<TValues>): CastProperties<TValues, string> | null;
-export const createYupValidator: (schema: AnySchema) => (values: any) => Promise<object>;
+export const createYupValidator: (schema: AnySchema) => (values: any) => Promise<object | null>;
 
 //# sourceMappingURL=types.d.ts.map

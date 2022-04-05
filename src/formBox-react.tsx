@@ -35,7 +35,7 @@ export function useCreateFormBox<TValues extends object>(
   formRef.current!.config = config;
 
   useEffect(() => {
-    // if (formRef.current!.config.validateOnMount) formRef.current!.validate();
+    if (formRef.current!.config.validateOnMount) formRef.current!.validate();
     return () => formRef.current!.destroy();
   }, []);
 

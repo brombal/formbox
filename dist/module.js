@@ -336,11 +336,12 @@ class $fa22644d03289891$export$8cd7ca2dd7ba6f89 {
     destroy() {
         this.box.unsubscribeAll();
     }
-    setValue(path, value) {
+    async setValue(path, value, noValidate = false) {
         this.setState([
             'values',
             ...$fa22644d03289891$export$b7c632328822445d(path)
         ], value);
+        if (!noValidate) await this.validate();
     }
     get state() {
         return this.box.data;

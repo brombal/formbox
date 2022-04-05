@@ -78,7 +78,7 @@ declare class FormBox<TValues extends object> implements FormBoxState<TValues> {
     get config(): FormBoxConfig<TValues>;
     set config(value: FormBoxConfig<TValues>);
     destroy(): void;
-    setValue(path: SelectorPath, value: any): void;
+    setValue(path: SelectorPath, value: any, noValidate?: boolean): Promise<void>;
     get state(): FormBoxState<TValues>;
     setState(selector: SelectorPath, value: any): void;
     setState(stateSetter: (state: FormBoxState<TValues>) => void): void;

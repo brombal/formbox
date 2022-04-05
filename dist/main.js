@@ -351,11 +351,12 @@ class $96bc46e22b7b614c$export$8cd7ca2dd7ba6f89 {
     destroy() {
         this.box.unsubscribeAll();
     }
-    setValue(path, value) {
+    async setValue(path, value, noValidate = false) {
         this.setState([
             'values',
             ...$96bc46e22b7b614c$export$b7c632328822445d(path)
         ], value);
+        if (!noValidate) await this.validate();
     }
     get state() {
         return this.box.data;

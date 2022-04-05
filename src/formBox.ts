@@ -82,7 +82,7 @@ export class FormBox<TValues extends object> implements FormBoxState<TValues> {
       (data) => !!data.errors,
       () => {
         this.box.set((data) => {
-          data.valid = !!data.errors
+          data.valid = !!data.errors;
         });
       },
     );
@@ -103,8 +103,11 @@ export class FormBox<TValues extends object> implements FormBoxState<TValues> {
     this.box.unsubscribeAll();
   }
 
-  setValue(path: SelectorPath, value: any): void {
+  async setValue(path: SelectorPath, value: any, noValidate = false): Promise<void> {
     this.setState(['values', ...cleanPath(path)], value);
+    if (!noValidate) {
+      await this.validate();
+    }
   }
 
   get state() {
@@ -234,7 +237,7 @@ export class FormBox<TValues extends object> implements FormBoxState<TValues> {
       submitting: false,
       validating: false,
       submitCount: 0,
-      valid: true
+      valid: true,
     };
 
     if (typeof this.config.initialState === 'function') {

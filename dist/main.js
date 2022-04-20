@@ -93,7 +93,7 @@ function $536ee4d39bd16db9$export$2e2bcd8739ae039(a, b, shallow = false) {
 function $d599850d96e929f8$export$2e2bcd8739ae039(value) {
     if (!value) return value;
     if (typeof value !== 'object') return value;
-    if (Array.isArray(value)) return Array.from(value);
+    if (Array.isArray(value)) return value.map($d599850d96e929f8$export$2e2bcd8739ae039);
     if (value.constructor === Error) return new Error(value.message);
     if (value.constructor === Date) return new Date(value);
     if (value.constructor === RegExp) return new RegExp(value);

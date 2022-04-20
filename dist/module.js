@@ -78,7 +78,7 @@ function $5182c3bee8e8757b$export$2e2bcd8739ae039(a, b, shallow = false) {
 function $bc090ca26e5812e2$export$2e2bcd8739ae039(value) {
     if (!value) return value;
     if (typeof value !== 'object') return value;
-    if (Array.isArray(value)) return Array.from(value);
+    if (Array.isArray(value)) return value.map($bc090ca26e5812e2$export$2e2bcd8739ae039);
     if (value.constructor === Error) return new Error(value.message);
     if (value.constructor === Date) return new Date(value);
     if (value.constructor === RegExp) return new RegExp(value);

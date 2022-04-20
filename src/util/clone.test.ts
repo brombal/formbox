@@ -8,6 +8,11 @@ test('Clone succeeds', () => {
   expect(clone('abc') === 'abc').toBe(true);
   expect(clone([1, 2, 3])).toStrictEqual([1, 2, 3]);
   expect(clone({ a: 1, b: 2, c: [1, 2, 3] })).toStrictEqual({ a: 1, b: 2, c: [1, 2, 3] });
+
+  const nestedObject = { d: 4 };
+  const cloneNestedObject = clone({ c: [nestedObject] });
+  expect(cloneNestedObject.c[0]).not.toBe(nestedObject);
+
   expect(clone(new RegExp('abc'))).toStrictEqual(new RegExp('abc'));
   expect(clone(/abc/)).not.toStrictEqual(/def/);
   expect(clone(new Date(123456789000))).toStrictEqual(new Date(123456789000));
